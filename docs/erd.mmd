@@ -1,0 +1,111 @@
+erDiagram
+    USER ||--o{ CLASSGROUP : "owns (as teacher)"
+    USER ||--o{ ENROLLMENT : "requests (as student)"
+    CLASSGROUP ||--o{ ENROLLMENT : "receives"
+    CLASSGROUP ||--o{ SESSION : "has"
+    CLASSGROUP ||--o{ QUIZ : "has"
+    CLASSGROUP ||--o{ MATERIAL : "has"
+    CLASSGROUP ||--o{ NOTICE : "has"
+    CLASSGROUP ||--o{ PAYMENT : "bills"
+    SESSION ||--o{ ATTENDANCE : "has"
+    USER ||--o{ ATTENDANCE : "marked for (as student)"
+    QUIZ ||--o{ ATTEMPT : "has"
+    QUIZ ||--|{ QUESTION : "embeds"
+    USER ||--o{ ATTEMPT : "submits (as student)"
+    USER ||--o{ PAYMENT : "owes (as student)"
+    USER ||--o{ NOTICE : "posts (as teacher)"
+    USER ||--o{ MATERIAL : "uploads (as teacher)"
+
+    USER {
+        ObjectId _id PK
+        string name
+        string email UK
+        string password "hashed"
+        string role "teacher or student"
+        string grade
+        string guardianPhone
+    }
+    CLASSGROUP {
+        ObjectId _id PK
+        string name
+        ObjectId teacher FK
+        string grade
+        string_array subjects
+        string description
+        string schedule
+        number monthlyFee
+        number maxStudents
+        string coverImageUrl
+        boolean published
+    }
+    ENROLLMENT {
+        ObjectId _id PK
+        ObjectId student FK
+        ObjectId classGroup FK
+        string status "pending, approved or rejected"
+        date requestedAt
+        date respondedAt
+    }
+    SESSION {
+        ObjectId _id PK
+        ObjectId classGroup FK
+        date date
+        string topic
+        string status "upcoming, completed or cancelled"
+    }
+    ATTENDANCE {
+        ObjectId _id PK
+        ObjectId session FK
+        ObjectId student FK
+        string status "present, late or absent"
+        date markedAt
+    }
+    PAYMENT {
+        ObjectId _id PK
+        ObjectId student FK
+        ObjectId classGroup FK
+        string month "YYYY-MM"
+        number amount
+        string status "paid, due or overdue"
+        date dueDate
+        date paidAt
+    }
+    QUIZ {
+        ObjectId _id PK
+        ObjectId classGroup FK
+        string title
+        string subject
+        number order
+        date dueDate
+        number durationMinutes
+        boolean published
+    }
+    QUESTION {
+        string text
+        string_array options
+        number correctIndex
+    }
+    ATTEMPT {
+        ObjectId _id PK
+        ObjectId quiz FK
+        ObjectId student FK
+        number_array answers
+        number score
+        date submittedAt
+    }
+    MATERIAL {
+        ObjectId _id PK
+        ObjectId classGroup FK
+        string title
+        string subject
+        string fileUrl
+        string fileName
+        ObjectId uploadedBy FK
+    }
+    NOTICE {
+        ObjectId _id PK
+        ObjectId classGroup FK
+        string title
+        string body
+        ObjectId postedBy FK
+    }
