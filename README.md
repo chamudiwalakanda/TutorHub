@@ -29,14 +29,9 @@
 - [About](#-about)
 - [Features](#-features)
 - [Tech Stack](#%EF%B8%8F-tech-stack)
-- [Entity-Relationship Diagram](#-entity-relationship-diagram)
-- [Screenshots](#-screenshots)
 - [Getting Started](#-getting-started)
-- [Demo Credentials](#-demo-credentials)
-- [Dark Theme](#-dark-theme)
 - [Project Structure](#-project-structure)
 - [Code Walkthrough Guide](#-code-walkthrough-guide)
-- [Notes on the Photos](#-notes-on-the-photos)
 
 ---
 
@@ -96,31 +91,6 @@ their score progress across every subject.
 | Frontend | React 19, Vite, React Router, Tailwind CSS |
 | Charts | Recharts (CVD-safe categorical palette) |
 | HTTP client | Axios |
-
-## 🗺️ Entity-Relationship Diagram
-
-![TutorHub ERD](docs/erd.png)
-
-`docs/erd.mmd` is the Mermaid source — edit it and re-render with `mmdc -i erd.mmd -o erd.png`
-(the [Mermaid CLI](https://github.com/mermaid-js/mermaid-cli)) if the schema changes. `Question`
-is shown separately for clarity but is actually embedded *inside* each `Quiz` document (an array
-subfield), not a separate MongoDB collection — everything else is its own collection linked by
-`ObjectId` references.
-
-## 📸 Screenshots
-
-> Add your own screenshots here once the app is running — drop the image files into
-> `docs/screenshots/` and reference them below, e.g.:
-> `![Landing page](docs/screenshots/landing.png)`
-
-| | |
-|---|---|
-| Landing page | Student dashboard |
-| *(add screenshot)* | *(add screenshot)* |
-| Teacher — My Classes | Teacher — Enrollment requests |
-| *(add screenshot)* | *(add screenshot)* |
-| Progress chart | Dark mode |
-| *(add screenshot)* | *(add screenshot)* |
 
 ## 🚀 Getting Started
 
@@ -191,27 +161,6 @@ npm run dev
 
 Open the URL it prints (usually `http://localhost:5173`) in your browser.
 
-## 🔑 Demo Credentials
-
-| Role | Email | Password | Owns / enrolled in |
-|---|---|---|---|
-| 👩‍🏫 Teacher | `teacher@tutorhub.lk` | `teacher123` | Owns **Class A** (Grade 11) and **Class B** (Grade 12) |
-| 👩‍🏫 Teacher | `fernando@tutorhub.lk` | `teacher123` | Owns **Class C** (Grade 10 foundation) |
-| 🧑‍🎓 Student | `student@tutorhub.lk` | `student123` | **Approved** in Class A, **pending** in Class B |
-
-There are 6 more demo students seeded with password `password123` — see
-`backend/src/seed/seed.js` for their emails and which classes they're in. The login
-page also has a **"Fill demo credentials"** button for the main teacher/student pair.
-
-> 🔍 **To see the approval workflow in action:** log in as `teacher@tutorhub.lk`,
-> open Class B ("Grade 12 - Combined Maths") and go to its **Requests** tab — the
-> demo student's pending request is sitting there, ready to approve or reject.
-
-## 🌓 Dark Theme
-
-Click the sun/moon icon in the top-right corner of any page to switch between light
-and dark mode. Your choice is remembered (saved in the browser) for next time.
-
 ## 📁 Project Structure
 
 ```
@@ -253,28 +202,3 @@ Suggested reading order if you're getting (re)familiar with the codebase:
    `frontend/src/pages/student/MyClasses.jsx` + `BrowseClasses.jsx` + `ClassDetail.jsx`
    — where everything comes together on screen
 
-## 🖼️ Notes on the Photos
-
-There are two kinds of placeholder photo spots, both using the same
-`PhotoPlaceholder` component: the landing/login page photos, and a **class cover
-photo** (a banner on every class's detail page, plus a thumbnail on every class card)
-in *both* the teacher and student panels.
-
-To use your real photos:
-
-1. Put your image files in `frontend/public/images/` (e.g. `hero.jpg`, `class-a-cover.jpg`)
-2. Replace the relevant `<PhotoPlaceholder .../>` with `<img src="/images/..." className="..." />`
-   — the comment right above each one shows exactly what to paste in. Look in
-   `pages/public/Landing.jsx`, `pages/public/Login.jsx`, `components/ClassCard.jsx`
-   (thumbnail), and both `pages/*/ClassDetail.jsx` files (the banner).
-
-`ClassGroup` already has a `coverImageUrl` field ready for a per-class photo upload
-feature — it's just not wired to an upload button yet, if you want to take that further.
-
----
-
-<div align="center">
-
-*A solo mini-project for EC4307 — Web Application Development.*
-
-</div>
