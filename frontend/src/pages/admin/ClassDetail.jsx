@@ -486,22 +486,58 @@ function emptyQuestion() {
 function QuizzesTab({ base, subjects }) {
   const [quizzes, setQuizzes] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [showForm, setShowForm] = useState(false);
+  const [editingQuizId, setEditingQuizId] = useState(null);
+  const [expandedQuizId, setExpandedQuizId] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [deletingQuizId, setDeletingQuizId] = useState('');
   const fallbackSubjects = subjects.length ? subjects : ['General'];
   const [form, setForm] = useState({
     title: '', subject: fallbackSubjects[0], order: 1, dueDate: '', durationMinutes: 20, published: true,
     questions: [emptyQuestion()],
   });
   const [error, setError] = useState('');
+  const showForm = editingQuizId !== null;
 
   async function load() {
-    const res = await api.get(`${base}/quizzes`);
-    setQuizzes(res.data);
+    try {
+      const res = await api.get(`${base}/quizzes`);
+      setQuizzes(res.data);
+    } catch (err) {
+      setError(err.response?.data?.message || 'Could not load quizzes.');
+    }
   }
 
   useEffect(() => {
     load().finally(() => setLoading(false));
   }, [base]);
+
+  function resetForm() {
+    setEditingQuizId(null);
+    setForm({
+      title: '', subject: fallbackSubjects[0], order: 1, dueDate: '', durationMinutes: 20, published: true,
+      questions: [emptyQuestion()],
+    });
+    setError('');
+  }
+
+  function editQuiz(quiz) {
+    setEditingQuizId(quiz._id);
+    setForm({
+      title: quiz.title,
+      subject: quiz.subject,
+      order: quiz.order,
+      dueDate: new Date(quiz.dueDate).toISOString().slice(0, 10),
+      durationMinutes: quiz.durationMinutes,
+      published: quiz.published,
+      questions: quiz.questions.map((question) => ({
+        text: question.text,
+        options: [...question.options],
+        correctIndex: question.correctIndex,
+      })),
+    });
+    setError('');
+    setExpandedQuizId('');
+  }
 
   function updateQuestion(i, patch) {
     setForm((f) => {
@@ -524,19 +560,34 @@ function QuizzesTab({ base, subjects }) {
   async function submit(e) {
     e.preventDefault();
     setError('');
+    setSaving(true);
     try {
-      await api.post(`${base}/quizzes`, form);
-      setShowForm(false);
-      setForm({ title: '', subject: fallbackSubjects[0], order: 1, dueDate: '', durationMinutes: 20, published: true, questions: [emptyQuestion()] });
-      load();
+      if (editingQuizId) {
+        await api.patch(`${base}/quizzes/${editingQuizId}`, form);
+      } else {
+        await api.post(`${base}/quizzes`, form);
+      }
+      resetForm();
+      await load();
     } catch (err) {
-      setError(err.response?.data?.message || 'Could not create quiz.');
+      setError(err.response?.data?.message || `Could not ${editingQuizId ? 'update' : 'create'} quiz.`);
+    } finally {
+      setSaving(false);
     }
   }
 
   async function remove(id) {
-    await api.delete(`${base}/quizzes/${id}`);
-    load();
+    setError('');
+    setDeletingQuizId(id);
+    try {
+      await api.delete(`${base}/quizzes/${id}`);
+      if (expandedQuizId === id) setExpandedQuizId('');
+      await load();
+    } catch (err) {
+      setError(err.response?.data?.message || 'Could not delete quiz.');
+    } finally {
+      setDeletingQuizId('');
+    }
   }
 
   if (loading) return <p className="text-sm text-ink-secondary dark:text-slate-400">Loading…</p>;
@@ -546,18 +597,24 @@ function QuizzesTab({ base, subjects }) {
       <div className="rounded-2xl border border-surface-border bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-800">
         <div className="flex items-center justify-between">
           <h3 className="flex items-center gap-2 text-base font-semibold text-ink dark:text-slate-100"><IconQuiz /> Quizzes</h3>
-          <button type="button" onClick={() => setShowForm((v) => !v)} className="rounded-lg bg-brand px-4 py-2 text-sm font-semibold text-white hover:bg-brand-dark">
+          <button
+            type="button"
+            onClick={() => (showForm ? resetForm() : setEditingQuizId(''))}
+            className="rounded-lg bg-brand px-4 py-2 text-sm font-semibold text-white hover:bg-brand-dark"
+          >
             {showForm ? 'Cancel' : '+ New quiz'}
           </button>
         </div>
 
+        {error && <p className="mt-3 text-sm text-danger-text dark:text-red-300">{error}</p>}
+
         {showForm && (
           <form onSubmit={submit} className="mt-5 space-y-4 rounded-xl border border-dashed border-surface-border p-4 dark:border-slate-700">
-            {error && <p className="text-sm text-danger-text dark:text-red-300">{error}</p>}
             <div className="grid gap-3 sm:grid-cols-2">
               <input required placeholder="Quiz title" value={form.title} onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))} className="rounded-lg border border-surface-border bg-white px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" />
               <select value={form.subject} onChange={(e) => setForm((f) => ({ ...f, subject: e.target.value }))} className="rounded-lg border border-surface-border bg-white px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100">
                 {fallbackSubjects.map((s) => <option key={s} value={s}>{s}</option>)}
+                {!fallbackSubjects.includes(form.subject) && <option value={form.subject}>{form.subject}</option>}
               </select>
               <input required type="date" value={form.dueDate} onChange={(e) => setForm((f) => ({ ...f, dueDate: e.target.value }))} className="rounded-lg border border-surface-border bg-white px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" />
               <input type="number" min={1} placeholder="Duration (minutes)" value={form.durationMinutes} onChange={(e) => setForm((f) => ({ ...f, durationMinutes: Number(e.target.value) }))} className="rounded-lg border border-surface-border bg-white px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" />
@@ -572,6 +629,7 @@ function QuizzesTab({ base, subjects }) {
               {form.questions.map((q, qi) => (
                 <div key={qi} className="rounded-lg border border-surface-border p-3 dark:border-slate-700">
                   <input
+                    required
                     placeholder={`Question ${qi + 1}`}
                     value={q.text}
                     onChange={(e) => updateQuestion(qi, { text: e.target.value })}
@@ -582,6 +640,7 @@ function QuizzesTab({ base, subjects }) {
                       <div key={oi} className="flex items-center gap-2">
                         <input type="radio" name={`correct-${qi}`} checked={q.correctIndex === oi} onChange={() => updateQuestion(qi, { correctIndex: oi })} />
                         <input
+                          required
                           placeholder={`Option ${oi + 1}`}
                           value={opt}
                           onChange={(e) => updateOption(qi, oi, e.target.value)}
@@ -590,6 +649,15 @@ function QuizzesTab({ base, subjects }) {
                       </div>
                     ))}
                   </div>
+                  {form.questions.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => setForm((f) => ({ ...f, questions: f.questions.filter((_, index) => index !== qi) }))}
+                      className="mt-2 text-xs font-medium text-danger-text hover:underline dark:text-red-300"
+                    >
+                      Remove question
+                    </button>
+                  )}
                 </div>
               ))}
             </div>
@@ -597,8 +665,8 @@ function QuizzesTab({ base, subjects }) {
               + Add question
             </button>
 
-            <button type="submit" className="w-full rounded-lg bg-brand px-4 py-2.5 text-sm font-semibold text-white hover:bg-brand-dark">
-              Create quiz
+            <button type="submit" disabled={saving} className="w-full rounded-lg bg-brand px-4 py-2.5 text-sm font-semibold text-white hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-60">
+              {saving ? 'Saving…' : editingQuizId ? 'Save changes' : 'Create quiz'}
             </button>
           </form>
         )}
@@ -613,8 +681,43 @@ function QuizzesTab({ base, subjects }) {
               </div>
               <div className="flex items-center gap-2">
                 <Badge tone={q.published ? 'success' : 'neutral'}>{q.published ? 'Published' : 'Draft'}</Badge>
-                <button type="button" onClick={() => remove(q._id)} className="text-xs font-medium text-danger-text hover:underline dark:text-red-300">Delete</button>
+                <button
+                  type="button"
+                  aria-expanded={expandedQuizId === q._id}
+                  onClick={() => setExpandedQuizId((id) => (id === q._id ? '' : q._id))}
+                  className="text-xs font-medium text-brand-dark hover:underline dark:text-brand"
+                >
+                  {expandedQuizId === q._id ? 'Hide' : 'View'}
+                </button>
+                <button type="button" onClick={() => editQuiz(q)} className="text-xs font-medium text-brand-dark hover:underline dark:text-brand">Edit</button>
+                <button
+                  type="button"
+                  disabled={deletingQuizId === q._id}
+                  onClick={() => remove(q._id)}
+                  className="text-xs font-medium text-danger-text hover:underline disabled:opacity-60 dark:text-red-300"
+                >
+                  {deletingQuizId === q._id ? 'Deleting…' : 'Delete'}
+                </button>
               </div>
+              {expandedQuizId === q._id && (
+                <div className="w-full basis-full space-y-3 rounded-lg bg-slate-50 p-3 dark:bg-slate-900/40">
+                  <p className="text-xs text-ink-secondary dark:text-slate-400">
+                    Quiz {q.order} · {q.durationMinutes} minutes · {q.questions.length} question(s)
+                  </p>
+                  {q.questions.map((question, index) => (
+                    <div key={index} className="text-sm text-ink dark:text-slate-100">
+                      <p className="font-medium">{index + 1}. {question.text}</p>
+                      <ul className="mt-1 grid gap-1 sm:grid-cols-2">
+                        {question.options.map((option, optionIndex) => (
+                          <li key={optionIndex} className={optionIndex === question.correctIndex ? 'font-medium text-success-text dark:text-emerald-300' : 'text-ink-secondary dark:text-slate-400'}>
+                            {String.fromCharCode(65 + optionIndex)}. {option}{optionIndex === question.correctIndex ? ' (correct)' : ''}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
+              )}
             </li>
           ))}
         </ul>

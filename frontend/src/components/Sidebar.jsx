@@ -17,9 +17,7 @@ export default function Sidebar({ title, links, open, onClose }) {
           ${open ? 'translate-x-0' : '-translate-x-full'}`}
       >
         <div className="flex h-16 items-center gap-2 border-b border-surface-border px-5 dark:border-slate-700">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand text-sm font-bold text-white">
-            TH
-          </div>
+          
           <div>
             <div className="text-sm font-semibold text-ink dark:text-slate-100">TutorHub</div>
             <div className="text-xs text-ink-secondary dark:text-slate-400">{title}</div>

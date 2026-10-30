@@ -65,7 +65,6 @@ export default function Login() {
       <div className="flex flex-col justify-center bg-white px-6 py-12 dark:bg-slate-900 sm:px-10 lg:px-16">
         <div className="mb-8 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand text-sm font-bold text-white">TH</div>
             <span className="text-lg font-semibold text-ink dark:text-slate-100">TutorHub</span>
           </Link>
           <ThemeToggle />
@@ -178,7 +177,7 @@ export default function Login() {
             onClick={fillDemo}
             className="mt-4 w-full rounded-lg border border-dashed border-surface-border px-4 py-2 text-xs font-medium text-ink-secondary transition-colors hover:border-brand hover:text-brand-dark dark:border-slate-700 dark:text-slate-400 dark:hover:text-sky-300"
           >
-            Fill demo {role} credentials
+            Fill
           </button>
 
           <p className="mt-6 text-center text-sm text-ink-secondary dark:text-slate-400">

@@ -18,9 +18,12 @@ export async function listQuizzes(req, res) {
 
   if (req.user.role === 'student') {
     const attempts = await Attempt.find({ student: req.user._id, quiz: { $in: quizzes.map((q) => q._id) } });
-    const attemptedIds = new Set(attempts.map((a) => String(a.quiz)));
+    const attemptsByQuiz = new Map(attempts.map((attempt) => [String(attempt.quiz), attempt]));
     return res.json(
-      quizzes.map((q) => ({ ...stripAnswers(q, true), attempted: attemptedIds.has(String(q._id)) }))
+      quizzes.map((q) => {
+        const attempt = attemptsByQuiz.get(String(q._id));
+        return { ...stripAnswers(q, true), attempted: Boolean(attempt), attemptScore: attempt?.score ?? null };
+      })
     );
   }
 

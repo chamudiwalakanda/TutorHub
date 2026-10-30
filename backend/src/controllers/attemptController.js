@@ -11,6 +11,12 @@ export async function submitAttempt(req, res) {
 
   const quiz = await Quiz.findOne({ _id: quizId, classGroup: req.classGroupId, published: true });
   if (!quiz) return res.status(404).json({ message: 'Quiz not found or not published' });
+  if (quiz.questions.length === 0 || answers.length !== quiz.questions.length) {
+    return res.status(400).json({ message: 'Please answer every question before submitting' });
+  }
+  if (answers.some((answer, index) => !Number.isInteger(answer) || answer < 0 || answer >= quiz.questions[index].options.length)) {
+    return res.status(400).json({ message: 'One or more answers are invalid' });
+  }
 
   const already = await Attempt.findOne({ quiz: quizId, student: req.user._id });
   if (already) return res.status(409).json({ message: 'You have already attempted this quiz' });

@@ -39,14 +39,14 @@
 
 Most "tuition class" projects assume one teacher and one class. **TutorHub doesn't.**
 
-Any teacher can register and create their own class — subjects, schedule, fee, the
-lot — and publish it for students to find. Students browse published classes and
+Any teacher can register and create their own class subjects, schedule, fee, the
+lot and publish it for students to find. Students browse published classes and
 request a seat; nothing opens up until the teacher reviews and approves that request.
 Once approved, a student gets a full dashboard for that class: quizzes, study
 materials, payment history, attendance as marked by the teacher, and a live chart of
 their score progress across every subject.
 
-> 💡 It's one login per person, not one login per class — a teacher who owns three
+> 💡 It's one login per person, not one login per class, a teacher who owns three
 > classes manages all three from a single "My Classes" screen.
 
 ## ✨ Features
@@ -70,7 +70,7 @@ their score progress across every subject.
 
 **🧑‍🎓 For students**
 - Browse every published class on offer
-- Request to enroll — track pending/approved/rejected
+- Request to enroll track pending/approved/rejected
 - See attendance %, marked by the teacher
 - Attempt auto-graded MCQ quizzes
 - Download learning materials
@@ -92,6 +92,7 @@ their score progress across every subject.
 | Charts | Recharts (CVD-safe categorical palette) |
 | HTTP client | Axios |
 
+<<<<<<< HEAD
 ## 🚀 Getting Started
 
 ### Prerequisites
@@ -161,6 +162,8 @@ npm run dev
 
 Open the URL it prints (usually `http://localhost:5173`) in your browser.
 
+=======
+>>>>>>> f734c24 (New Read and Update Operations are coded)
 ## 📁 Project Structure
 
 ```

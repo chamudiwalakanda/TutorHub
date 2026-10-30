@@ -15,8 +15,7 @@ export default function ClassCard({ classData, footer, onClick }) {
         onClick ? 'cursor-pointer hover:-translate-y-0.5 hover:shadow-md' : ''
       }`}
     >
-      {/* Replace with: <img src="/images/your-class-photo.jpg" className="h-32 w-full object-cover" /> */}
-      <PhotoPlaceholder label="Class photo" className="h-32 w-full" rounded="rounded-none" />
+      {/*<img src="/images/cmaths1.png" className="h-32 w-full object-cover" /> */}
       <div className="flex flex-1 flex-col p-4">
         <div className="flex items-start justify-between gap-2">
           <h3 className="text-base font-semibold text-ink dark:text-slate-100">{c.name}</h3>

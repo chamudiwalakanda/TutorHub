@@ -42,6 +42,11 @@ export default function ClassDetail() {
   const [materials, setMaterials] = useState([]);
   const [payments, setPayments] = useState([]);
   const [progress, setProgress] = useState({});
+  const [selectedQuiz, setSelectedQuiz] = useState(null);
+  const [answers, setAnswers] = useState([]);
+  const [quizResult, setQuizResult] = useState(null);
+  const [quizError, setQuizError] = useState('');
+  const [submittingQuiz, setSubmittingQuiz] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -79,6 +84,39 @@ export default function ClassDetail() {
     return () => { cancelled = true; };
   }, [classGroupId]);
 
+  function openQuiz(quiz) {
+    setSelectedQuiz(quiz);
+    setAnswers(quiz.questions.map(() => null));
+    setQuizResult(null);
+    setQuizError('');
+  }
+
+  async function submitQuiz(event) {
+    event.preventDefault();
+    if (!selectedQuiz) return;
+    setQuizError('');
+    setSubmittingQuiz(true);
+    try {
+      const result = await api.post(`${base}/attempts`, { quizId: selectedQuiz._id, answers });
+      setQuizResult(result.data);
+      setQuizzes((current) => current.map((quiz) => (
+        quiz._id === selectedQuiz._id
+          ? { ...quiz, attempted: true, attemptScore: result.data.score }
+          : quiz
+      )));
+      try {
+        const progressRes = await api.get(`${base}/attempts/me/progress`);
+        setProgress(progressRes.data);
+      } catch {
+        setQuizError('Your quiz was submitted, but your progress chart could not be refreshed.');
+      }
+    } catch (err) {
+      setQuizError(err.response?.data?.message || 'Could not submit this quiz.');
+    } finally {
+      setSubmittingQuiz(false);
+    }
+  }
+
   const { rows: chartRows, subjects } = useMemo(() => buildChartRows(progress), [progress]);
 
   if (loading) {
@@ -104,8 +142,7 @@ export default function ClassDetail() {
 
       {classInfo && (
         <div className="overflow-hidden rounded-2xl border border-surface-border bg-white shadow-sm dark:border-slate-700 dark:bg-slate-800">
-          {/* Replace with: <img src="/images/your-class-cover.jpg" className="h-40 w-full object-cover" /> */}
-          <PhotoPlaceholder label="Class cover photo" className="h-40 w-full" rounded="rounded-none" />
+          <img src="/images/cmaths1.png" className="h-40 w-full object-cover" />
           <div className="p-5">
             <h2 className="text-xl font-semibold text-ink dark:text-slate-50">{classInfo.name}</h2>
             <p className="text-sm text-ink-secondary dark:text-slate-400">Taught by {classInfo.teacherName}</p>
@@ -198,13 +235,26 @@ export default function ClassDetail() {
           <h3 className="text-base font-semibold text-ink dark:text-slate-100">Quizzes</h3>
           <ul className="mt-4 space-y-3">
             {quizzes.length === 0 && <li className="text-sm text-ink-secondary dark:text-slate-400">No quizzes published yet.</li>}
-            {quizzes.slice(0, 5).map((q) => (
+            {quizzes.map((q) => (
               <li key={q._id} className="flex items-center justify-between gap-2 border-b border-surface-border pb-3 last:border-0 last:pb-0 dark:border-slate-700">
                 <div>
                   <div className="text-sm font-medium text-ink dark:text-slate-100">{q.title}</div>
-                  <div className="text-xs text-ink-secondary dark:text-slate-400">{q.subject} · due {new Date(q.dueDate).toLocaleDateString()}</div>
+                  <div className="text-xs text-ink-secondary dark:text-slate-400">
+                    {q.subject} · due {new Date(q.dueDate).toLocaleDateString()}
+                    {q.attempted && ` · Score: ${q.attemptScore}%`}
+                  </div>
                 </div>
-                <Badge tone={q.attempted ? 'success' : 'brand'}>{q.attempted ? 'Done' : 'Open'}</Badge>
+                {q.attempted ? (
+                  <Badge tone="success">Completed</Badge>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => openQuiz(q)}
+                    className="rounded-lg bg-brand px-3 py-1.5 text-xs font-semibold text-white hover:bg-brand-dark"
+                  >
+                    Start quiz
+                  </button>
+                )}
               </li>
             ))}
           </ul>
@@ -234,6 +284,68 @@ export default function ClassDetail() {
           </ul>
         </div>
       </div>
+
+      {selectedQuiz && (
+        <div className="rounded-2xl border border-surface-border bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-800">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <h3 className="text-base font-semibold text-ink dark:text-slate-100">{selectedQuiz.title}</h3>
+              <p className="mt-1 text-sm text-ink-secondary dark:text-slate-400">
+                {selectedQuiz.subject} · {selectedQuiz.durationMinutes} minutes · {selectedQuiz.questions.length} question(s)
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setSelectedQuiz(null)}
+              className="text-sm font-medium text-brand-dark hover:underline dark:text-brand"
+            >
+              Close
+            </button>
+          </div>
+
+          {quizError && <p className="mt-4 text-sm text-danger-text dark:text-red-300">{quizError}</p>}
+
+          {quizResult ? (
+            <div className="mt-5 rounded-xl bg-success-bg p-4 text-success-text dark:bg-emerald-900/30 dark:text-emerald-300">
+              <p className="text-lg font-semibold">Your score: {quizResult.score}%</p>
+              <p className="mt-1 text-sm">{quizResult.correct} of {quizResult.total} answers correct.</p>
+            </div>
+          ) : (
+            <form onSubmit={submitQuiz} className="mt-5 space-y-5">
+              {selectedQuiz.questions.map((question, questionIndex) => (
+                <fieldset key={questionIndex} className="rounded-xl border border-surface-border p-4 dark:border-slate-700">
+                  <legend className="px-1 text-sm font-semibold text-ink dark:text-slate-100">
+                    {questionIndex + 1}. {question.text}
+                  </legend>
+                  <div className="mt-2 space-y-2">
+                    {question.options.map((option, optionIndex) => (
+                      <label key={optionIndex} className="flex cursor-pointer items-center gap-2 text-sm text-ink-secondary dark:text-slate-300">
+                        <input
+                          required
+                          type="radio"
+                          name={`quiz-${selectedQuiz._id}-question-${questionIndex}`}
+                          checked={answers[questionIndex] === optionIndex}
+                          onChange={() => setAnswers((current) => current.map((answer, index) => (
+                            index === questionIndex ? optionIndex : answer
+                          )))}
+                        />
+                        {option}
+                      </label>
+                    ))}
+                  </div>
+                </fieldset>
+              ))}
+              <button
+                type="submit"
+                disabled={submittingQuiz}
+                className="rounded-lg bg-brand px-4 py-2.5 text-sm font-semibold text-white hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {submittingQuiz ? 'Submitting…' : 'Submit quiz'}
+              </button>
+            </form>
+          )}
+        </div>
+      )}
 
       {/* Payments table */}
       <div className="rounded-2xl border border-surface-border bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-800">

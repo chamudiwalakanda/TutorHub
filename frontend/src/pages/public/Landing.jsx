@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom';
 import ThemeToggle from '../../components/ThemeToggle.jsx';
-import PhotoPlaceholder from '../../components/PhotoPlaceholder.jsx';
 import { useReveal } from '../../hooks/useReveal.js';
 import {
   IconCalendar,
@@ -42,7 +41,6 @@ export default function Landing() {
       <header className="sticky top-0 z-30 border-b border-surface-border bg-white/90 backdrop-blur dark:border-slate-800 dark:bg-slate-900/90">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand text-sm font-bold text-white">TH</div>
             <span className="text-lg font-semibold text-ink dark:text-slate-100">TutorHub</span>
           </div>
           <nav className="hidden items-center gap-8 text-sm font-medium text-ink-secondary dark:text-slate-300 md:flex">
@@ -66,17 +64,15 @@ export default function Landing() {
       <section className="relative overflow-hidden bg-surface-page dark:bg-slate-900">
         <div className="mx-auto grid max-w-7xl items-center gap-10 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:px-8 lg:py-24">
           <div className="animate-fade-in-up">
-            <span className="inline-flex items-center rounded-full bg-brand-light px-3 py-1 text-xs font-semibold text-brand-dark dark:bg-brand-dark/20 dark:text-sky-300">
-              For one teacher, one class, zero chaos
-            </span>
+            
             <h1 className="mt-4 text-4xl font-bold tracking-tight text-ink dark:text-slate-50 sm:text-5xl">
-              Run your Combined Maths class like a pro —{' '}
+              Run your Combined Maths class like a pro, {' '} 
               <span className="text-brand-dark dark:text-brand">without the spreadsheets</span>
             </h1>
             <p className="mt-5 text-lg leading-relaxed text-ink-secondary dark:text-slate-300">
               TutorHub brings scheduling, attendance, fees, quizzes, materials and progress
-              tracking for Grade 10–13 Combined Maths into one simple, friendly dashboard —
-              built for a single tuition teacher and their students.
+              tracking for classes into one simple, friendly dashboard
+              built for a tuition teacher and their students.
             </p>
             <div className="mt-8 flex flex-wrap gap-4">
               <Link
@@ -92,6 +88,8 @@ export default function Landing() {
                 See how it works
               </a>
             </div>
+            
+            {/*
             <div className="mt-10 flex items-center gap-6 text-sm text-ink-secondary dark:text-slate-400">
               <div><span className="font-semibold text-ink dark:text-slate-100">Grade 11</span> Combined Maths</div>
               <div className="h-4 w-px bg-surface-border dark:bg-slate-700" />
@@ -99,6 +97,7 @@ export default function Landing() {
               <div className="h-4 w-px bg-surface-border dark:bg-slate-700" />
               <div><span className="font-semibold text-ink dark:text-slate-100">Rs. 3,500</span> / month</div>
             </div>
+            */}
           </div>
 
           <div className="relative animate-fade-in">
@@ -124,8 +123,8 @@ export default function Landing() {
           <Reveal className="mx-auto max-w-2xl text-center">
             <h2 className="text-3xl font-bold text-ink dark:text-slate-50">Everything a tuition class needs</h2>
             <p className="mt-3 text-ink-secondary dark:text-slate-300">
-              One dashboard for the teacher, one for the students — built around how a real
-              Combined Maths class actually runs.
+              One dashboard for the teacher, one for the students built around how a real
+              tution class actually runs.
             </p>
           </Reveal>
 
@@ -159,9 +158,9 @@ export default function Landing() {
               Built for one teacher who wanted less admin, more teaching
             </h2>
             <p className="mt-4 leading-relaxed text-ink-secondary dark:text-slate-300">
-              Mr. Perera has taught Combined Maths for Grade 10–13 students for years, tracking
+              Mr. Perera has taught Combined Maths for A/L students for years, tracking
               attendance on paper and fees in a notebook. TutorHub replaces that notebook with a
-              simple system that students can check themselves — fewer questions about "did I
+              simple system that students can check themselves fewer questions about "did I
               pay this month?" and "what did I get on the last quiz?", more time for teaching.
             </p>
             <ul className="mt-6 space-y-3">
@@ -221,7 +220,7 @@ export default function Landing() {
             <span className="font-semibold">TutorHub</span>
           </div>
           <p className="text-sm text-slate-400">
-            A university project — Web Application Development module, University of Ruhuna.
+           Tution Class Management System. All rights reserved.
           </p>
         </div>
       </footer>
