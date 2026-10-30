@@ -102,8 +102,7 @@ export default function Landing() {
           </div>
 
           <div className="relative animate-fade-in">
-            {/* Replace with: <img src="/images/hero.jpg" alt="Students in a classroom" className="h-full w-full object-cover rounded-2xl" /> */}
-            <PhotoPlaceholder label="Hero photo — classroom" className="aspect-[4/3] w-full shadow-xl" />
+            <img src="/images/hero.jpg" alt="Students in a classroom" className="h-full w-full object-cover rounded-2xl" /> 
             <div className="absolute -bottom-6 -left-6 hidden rounded-xl border border-surface-border bg-white p-4 shadow-lg dark:border-slate-700 dark:bg-slate-800 sm:block">
               <div className="flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-full bg-success-bg text-success-text dark:bg-emerald-900/30 dark:text-emerald-300">
@@ -152,8 +151,7 @@ export default function Landing() {
       <section id="about" className="bg-surface-page py-20 dark:bg-slate-800/40">
         <div className="mx-auto grid max-w-7xl items-center gap-10 px-4 sm:px-6 lg:grid-cols-2 lg:px-8">
           <Reveal>
-            {/* Replace with: <img src="/images/about.jpg" alt="Teacher helping a student" className="rounded-2xl object-cover w-full aspect-[4/3]" /> */}
-            <PhotoPlaceholder label="About photo — teacher & student" className="aspect-[4/3] w-full shadow-lg" />
+            <img src="/images/about.jpg" alt="Teacher helping a student" className="rounded-2xl object-cover w-full aspect-[4/3]" />
           </Reveal>
           <Reveal>
             <span className="text-sm font-semibold uppercase tracking-wide text-brand-dark dark:text-brand">About TutorHub</span>

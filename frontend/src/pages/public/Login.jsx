@@ -52,8 +52,7 @@ export default function Login() {
     <div className="grid min-h-screen lg:grid-cols-2">
       {/* Photo side */}
       <div className="relative hidden lg:block">
-        {/* Replace with: <img src="/images/login.jpg" alt="Classroom" className="h-full w-full object-cover" /> */}
-        <PhotoPlaceholder label="Classroom photo" className="h-full w-full rounded-none" />
+        <img src="/images/login.jpg" alt="Classroom" className="h-full w-full object-cover" />
         <div className="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black/60 via-black/10 to-transparent p-10">
           <h2 className="text-2xl font-bold text-white">Welcome back to TutorHub</h2>
           <p className="mt-2 max-w-sm text-sm text-white/80">
